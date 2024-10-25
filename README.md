@@ -1,2 +1,2 @@
-# blog
+# Blog
 Just write it.
