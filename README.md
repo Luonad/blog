@@ -1,2 +1,4 @@
 # Blog
-Just write it.
+> Just write it.
+> 
+> 记录问题、思考、人生。
