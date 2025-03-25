@@ -4,7 +4,7 @@
 
 测试灰度节点消费消息是发现rocketmq客户端日志拉取消息时出现ERROR日志
 `subscription group [%s] does not exist`。
-查看相关源代码得出是没有订阅关系导致的，代码如下：
+查看相关源代码得出是消费组导致的，代码如下：
 ```java
         SubscriptionGroupConfig subscriptionGroupConfig =
             this.brokerController.getSubscriptionGroupManager().findSubscriptionGroupConfig(requestHeader.getConsumerGroup());
@@ -14,13 +14,13 @@
             return response;
         }
 ```
-一路追踪代码查看调用链路，发现是broker集群关闭了自动创建订阅关系，只能通过管控端api创建订阅关系。生产环境为了管控才这么做的。
+一路追踪代码查看调用链路，发现是broker集群在配置文件关闭了自动创建消费组功能，只能通过管控端api创建消费组。生产环境为了管控才这么做的。
 相关代码如下：
 ```java
     public SubscriptionGroupConfig findSubscriptionGroupConfig(final String group) {
         SubscriptionGroupConfig subscriptionGroupConfig = this.subscriptionGroupTable.get(group);
         if (null == subscriptionGroupConfig) {
-            // 判断broker配置是否允许自动创建订阅关系或者系统消费组
+            // 判断broker配置是否允许自动创建消费组或者系统消费组
             if (brokerController.getBrokerConfig().isAutoCreateSubscriptionGroup() || MixAll.isSysConsumerGroup(group)) {
                 subscriptionGroupConfig = new SubscriptionGroupConfig();
                 subscriptionGroupConfig.setGroupName(group);
@@ -36,4 +36,4 @@
     }
 ```
 # 解决办法
-- 通过管控端API创建订阅关系即可。
+- 通过管控端API创建消费组即可。
